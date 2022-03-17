@@ -63,7 +63,7 @@ const Navbar = () => {
 
           <NextLink href="/cart" passHref>
             <Stack>
-              <Box sx={{ position: 'relative' }}>
+              <Box sx={{ position: 'relative', cursor: 'pointer' }}>
                 <ShoppingCartOutlinedIcon
                   fontSize="large"
                   sx={{ color: '#fff' }}
