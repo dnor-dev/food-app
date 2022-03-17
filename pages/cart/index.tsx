@@ -63,12 +63,10 @@ const Cart = () => {
     try {
       const res = await FoodApi.createOrder(data);
       res.status === 200 && push(`/orders/${res.data._id}`);
+      dispatch({
+        type: actionTypes.RESET,
+      });
       handleDialog();
-      setTimeout(() => {
-        dispatch({
-          type: actionTypes.RESET,
-        });
-      }, 3000);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -170,7 +168,7 @@ const Cart = () => {
                       </TableCell>
                       <TableCell>
                         {product.extras.length !== 0 &&
-                          product.extras.map((extra: any) => extra.text)}
+                          product.extras.map((extra: any) => `${extra.text}, `)}
                       </TableCell>
                       <TableCell>${product.price}</TableCell>
                       <TableCell>{product.quantity}</TableCell>

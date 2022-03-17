@@ -33,7 +33,6 @@ type orderParams = {
 };
 
 const Order = ({ order }: orderParams) => {
-  console.log(order);
   const [status, setStatus] = useState({
     paid: true,
     preparing: false,

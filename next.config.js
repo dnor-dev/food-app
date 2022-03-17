@@ -1,9 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   env: {
-    CLIENT_ID:
-      'AePhjjBxJB1xZFaXM0E926d9f73jvJg5OTDmxNkvueKNVWKEMyZf-KaqY6YhasmI8U7YirdeQ_6-AUJz',
+    USERNAME: 'admin',
+    PASSWORD: '1234',
+  },
+  images: {
+    domains: ['res.cloudinary.com'],
   },
 };
 

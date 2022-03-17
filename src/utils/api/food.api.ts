@@ -51,6 +51,10 @@ class Food {
   async getOrders() {
     return api.get(`/api/orders`);
   }
+
+  async login(data: { username: string; password: string }) {
+    return api.post(`/api/admin`, data);
+  }
 }
 
 const FoodApi = new Food();

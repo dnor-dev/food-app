@@ -23,6 +23,7 @@ import AddIcon from '@mui/icons-material/Add';
 import AddProducts from '../../src/components/AddProducts';
 import { chunk, ceil } from 'lodash';
 import DeleteOrder from '../../src/components/DeleteOrder';
+import type { GetServerSideProps } from 'next';
 
 type dataProps = {
   data: {
@@ -134,7 +135,6 @@ const Admin = ({ data, orders }: dataProps) => {
 
       <Stack
         direction="row"
-        my={5}
         p={5}
         justifyContent="space-between"
         sx={{
@@ -234,7 +234,7 @@ const Admin = ({ data, orders }: dataProps) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {orderDataArray.map((order, i) => (
+              {chunkedOrders[page].map((order, i) => (
                 <TableRow key={i} sx={{ cursor: 'pointer' }}>
                   <TableCell>{order._id.toString().slice(0, 5)}...</TableCell>
                   <TableCell>{order.customer}</TableCell>
@@ -295,7 +295,17 @@ const Admin = ({ data, orders }: dataProps) => {
 
 export default Admin;
 
-export const getServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const cookie = (await ctx.req?.cookies) || '';
+  if (cookie.food_app !== process.env.TOKEN) {
+    return {
+      redirect: {
+        destination: '/admin/login',
+        permanent: false,
+      },
+    };
+  }
+
   try {
     const [data, orders] = await Promise.all([
       FoodApi.getProducts(),

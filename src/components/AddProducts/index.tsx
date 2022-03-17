@@ -11,9 +11,11 @@ import {
   Typography,
   Box,
   LinearProgress,
+  Chip,
 } from '@mui/material';
 import adminActions from '../../redux/actions/admin';
 import { useRouter } from 'next/router';
+import CloudinaryApiService from '../../utils/api/cloudinary.api';
 
 type Props = {
   open: boolean;
@@ -21,7 +23,6 @@ type Props = {
 };
 
 interface Inputs {
-  img: string;
   title: string;
   desc: string;
   prices: number[];
@@ -29,8 +30,13 @@ interface Inputs {
 
 const AddProducts = ({ open, handleOpen }: Props) => {
   const { reload } = useRouter();
+  const [extraOptions, setExtraOptions] = useState<
+    {
+      text: string;
+      price: number;
+    }[]
+  >([]);
   const [data, setData] = useState<Inputs>({
-    img: '',
     title: '',
     desc: '',
     prices: [],
@@ -39,8 +45,17 @@ const AddProducts = ({ open, handleOpen }: Props) => {
   const [medium, setMedium] = useState('');
   const [small, setSmall] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [extra, setExtra] = useState({
+    text: '',
+    price: 0,
+  });
+  const [error, setError] = useState(false);
+  const [imgFile, setImgFile] = useState(null);
+  const [img, setImg] = useState('');
 
   const { _addProducts } = adminActions;
+
+  const { title, desc, prices } = data;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -50,20 +65,43 @@ const AddProducts = ({ open, handleOpen }: Props) => {
     });
   };
 
-  const { img, title, desc, prices } = data;
+  const handleExtraInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setExtra({
+      ...extra,
+      [name]: value,
+    });
+  };
+
+  const handleExtra = () => {
+    extra.text !== '' || extra.price !== 0
+      ? setExtraOptions((prev) => [...prev, extra])
+      : alert('Please add valid details');
+  };
+
+  const uploadImage = async () => {
+    const data = new FormData();
+    data.append('file', imgFile || 'img');
+    data.append('upload_preset', 'food_app');
+    try {
+      const upload = await CloudinaryApiService.uploadImage(data);
+      setImg(upload.data.secure_url);
+    } catch (error) {
+      alert('Something went wrong with your image');
+    }
+  };
 
   const callback = () => {
     reload();
   };
 
   const handleClick = () => {
-    if (img === '' || title === '' || desc === '' || prices.length)
-      return false;
     setIsLoading(true);
+    uploadImage();
+    setError(false);
     handleOpen();
     prices.push(parseInt(small), parseInt(medium), parseInt(large));
-    _addProducts(data, callback, setIsLoading);
-    return true;
+    _addProducts({ img, ...data, extraOptions }, callback, setIsLoading);
   };
   return (
     <>
@@ -73,20 +111,17 @@ const AddProducts = ({ open, handleOpen }: Props) => {
         </Box>
       )}
       <Dialog fullWidth maxWidth="xs" open={open} onClose={handleOpen}>
-        <DialogTitle>Pay with Cash</DialogTitle>
+        <DialogTitle>Add Products</DialogTitle>
         <DialogContent>
           <Stack spacing={3.5} py={2}>
             <FormControl fullWidth>
               <TextField
                 fullWidth
                 name="img"
-                value={img}
                 size="small"
-                type="text"
-                variant="filled"
-                label="Image"
+                type="file"
                 placeholder="/images/..."
-                onChange={handleChange}
+                onChange={(e: any) => setImgFile(e.target.files[0])}
               />
             </FormControl>
             <FormControl fullWidth>
@@ -100,6 +135,7 @@ const AddProducts = ({ open, handleOpen }: Props) => {
                 variant="filled"
                 placeholder="Indiana pizza"
                 onChange={handleChange}
+                error={error}
               />
             </FormControl>
             <FormControl fullWidth>
@@ -115,6 +151,7 @@ const AddProducts = ({ open, handleOpen }: Props) => {
                 rows={2}
                 placeholder="about product"
                 onChange={handleChange}
+                error={error}
               />
             </FormControl>
             <FormControl fullWidth>
@@ -130,6 +167,7 @@ const AddProducts = ({ open, handleOpen }: Props) => {
                   variant="filled"
                   placeholder="enter"
                   onChange={(e) => setSmall(e.target.value)}
+                  error={error}
                 />
                 <TextField
                   fullWidth
@@ -141,6 +179,7 @@ const AddProducts = ({ open, handleOpen }: Props) => {
                   variant="filled"
                   placeholder="enter"
                   onChange={(e) => setMedium(e.target.value)}
+                  error={error}
                 />
                 <TextField
                   fullWidth
@@ -152,13 +191,60 @@ const AddProducts = ({ open, handleOpen }: Props) => {
                   variant="filled"
                   placeholder="enter"
                   onChange={(e) => setLarge(e.target.value)}
+                  error={error}
                 />
               </Stack>
             </FormControl>
+
+            <FormControl fullWidth>
+              <Typography mb={1.3}>Extras</Typography>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <TextField
+                  fullWidth
+                  name="text"
+                  size="small"
+                  type="text"
+                  label="Name"
+                  variant="filled"
+                  placeholder="enter"
+                  onChange={handleExtraInput}
+                />
+                <TextField
+                  fullWidth
+                  name="price"
+                  size="small"
+                  type="number"
+                  label="Price"
+                  variant="filled"
+                  placeholder="enter"
+                  onChange={handleExtraInput}
+                />
+                <Button variant="contained" size="small" onClick={handleExtra}>
+                  ADD
+                </Button>
+              </Stack>
+            </FormControl>
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
+              flexWrap="wrap"
+            >
+              {extraOptions.map((opt, i) => (
+                <Chip label={opt.text} key={i} />
+              ))}
+            </Stack>
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleOpen}>Cancel</Button>
+          <Button
+            onClick={() => {
+              handleOpen();
+              extraOptions.splice(0, extraOptions.length);
+            }}
+          >
+            Cancel
+          </Button>
           <Button onClick={handleClick}>Add</Button>
         </DialogActions>
       </Dialog>

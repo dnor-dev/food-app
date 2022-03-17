@@ -30,6 +30,10 @@ const _addProducts = async (
     title: string;
     desc: string;
     prices: number[];
+    extraOptions: {
+      text: string;
+      price: number;
+    }[];
   },
   callback: () => void,
   setIsLoading?: (x: boolean) => void,
@@ -71,6 +75,30 @@ const _deleteOrder = async (
   }
 };
 
-const adminActions = { _deleteProducts, _addProducts, _deleteOrder };
+const _login = async (
+  data: { username: string; password: string },
+  callback: () => void,
+  setIsLoading: (x: boolean) => void,
+  setError: (x: boolean) => void,
+) => {
+  try {
+    await FoodApi.login(data);
+    setError(false);
+    callback();
+    setIsLoading && setIsLoading(false);
+  } catch (error: any) {
+    setError(true);
+    setIsLoading && setIsLoading(false);
+    if (error?.message === 'Network Error') {
+      alert('You are offline');
+    } else if (error?.response?.data?.message) {
+      alert(error.response.data.message);
+    } else {
+      alert('Something went wrong.');
+    }
+  }
+};
+
+const adminActions = { _deleteProducts, _addProducts, _deleteOrder, _login };
 
 export default adminActions;
