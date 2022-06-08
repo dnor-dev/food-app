@@ -1,7 +1,11 @@
 // import Cookies from 'universal-cookie';
 import Cookies from 'cookies';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { runMiddleware } from '../cors';
 
-const handler = async (req: any, res: any) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  await runMiddleware(req, res);
+
   const { body, method } = req;
   let cookies = new Cookies(req, res);
   let token = process.env.TOKEN;
@@ -14,7 +18,7 @@ const handler = async (req: any, res: any) => {
           password === process.env.PASSWORD
         ) {
           cookies.set('food_app', token, {
-            httpOnly: true,
+            httpOnly: false,
             maxAge: 600000,
           });
           res.status(200).json('Successful!');

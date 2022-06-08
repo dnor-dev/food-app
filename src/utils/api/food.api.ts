@@ -6,9 +6,23 @@ const baseURL = 'https://dfoods-app.herokuapp.com';
 const defaultConfig = {
   baseURL,
   timeout: 60000,
+  headers: {
+    'Content-type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  },
 };
 
 const api = axios.create({ ...defaultConfig });
+api.interceptors.request.use(
+  (config) => {
+    config.headers = {
+      ...config.headers,
+    };
+
+    return config;
+  },
+  (err) => Promise.reject(err),
+);
 
 class Food {
   async getProducts() {

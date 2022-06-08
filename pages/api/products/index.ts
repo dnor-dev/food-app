@@ -1,8 +1,11 @@
 import Products from '../../../models/Product';
 import dbConnect from '../../../src/utils/mongo';
+import { runMiddleware } from '../cors';
 
 const handler = async (req: any, res: any) => {
   const { method, body } = req;
+
+  await runMiddleware(req, res);
 
   dbConnect();
 

@@ -1,4 +1,5 @@
 import Orders from '../../../models/Order';
+import { runMiddleware } from '../cors';
 import dbConnect from '../../../src/utils/mongo';
 
 const handler = async (req: any, res: any) => {
@@ -7,6 +8,8 @@ const handler = async (req: any, res: any) => {
     body,
     query: { id },
   } = req;
+
+  await runMiddleware(req, res);
 
   dbConnect();
 
