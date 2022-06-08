@@ -34,7 +34,8 @@ import {
 import FoodApi from '../../src/utils/api/food.api';
 
 const paypalScriptOptions: PayPalScriptOptions = {
-  'client-id': process.env.CLIENT_ID,
+  'client-id':
+    'AePhjjBxJB1xZFaXM0E926d9f73jvJg5OTDmxNkvueKNVWKEMyZf-KaqY6YhasmI8U7YirdeQ_6-AUJz',
   currency: 'USD',
   'disable-funding': 'card',
 };
