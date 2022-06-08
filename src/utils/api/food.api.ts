@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { shippingDetails } from '../../../pages/cart';
 
-const baseURL = 'http://localhost:3000';
+const baseURL = 'https://dfoods-app.herokuapp.com';
 
 const defaultConfig = {
   baseURL,
